@@ -9,7 +9,7 @@ class ProjectModel implements Serializable {
     }
     def readConfig(name){
         def jsonSlurper = new JsonSlurper()
-        def config = jsonSlurper.parse(this._context.libraryResource("config.json"))
+        def config = jsonSlurper.parseText(this._context.libraryResource("config.json"))
         return config[name]
     }
  }
