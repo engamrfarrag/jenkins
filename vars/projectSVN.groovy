@@ -1,4 +1,7 @@
 
-def call(Project config){
-    
+def svnUpdate(){
+
+}
+def svnSearch(){
+
 }

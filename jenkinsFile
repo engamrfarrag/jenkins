@@ -9,13 +9,13 @@ pipeline {
             steps {
                 script{
                     config=projectConfig(project)
-                    echo config.node.name
+                    
                 }
             }
         }
         stage('Build Project'){
             steps{
-                node(config.node.name){
+                node(config.buildNode){
                     script{
                     svn=projectSVN(config)
                     if(svn.status){
