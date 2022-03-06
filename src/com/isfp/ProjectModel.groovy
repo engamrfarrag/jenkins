@@ -3,6 +3,7 @@ import groovy.json.JsonSlurper
 
 class ProjectModel implements Serializable {
     def _context
+    String buildNode
     ProjectModel(context){
         this._context=context
 
@@ -10,6 +11,6 @@ class ProjectModel implements Serializable {
     def readConfig(name){
         def jsonSlurper = new JsonSlurper()
         def config = jsonSlurper.parseText(this._context.libraryResource("config.json"))
-        return config[name]
+        return config[name].buildNode
     }
  }
