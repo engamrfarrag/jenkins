@@ -1,4 +1,4 @@
-@Lib('isfpLib') _
+@Library('isfpLib') _
 def config =[:]
 
 pipeline {
