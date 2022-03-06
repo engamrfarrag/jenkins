@@ -8,7 +8,7 @@ class ProjectModel implements Serializable {
     String appDirectory;
     ProjectModel(name){
         def jsonSlurper = new JsonSlurper()
-        def config = jsonSlurper.parse(new File('../../resources/config.json'))
+        def config = jsonSlurper.parse(new File('resources/config.json'))
         this.projectName=name
         this.buildNode=config[name].buildNode
         this.buildDirectory=config[name].buildDirectory
