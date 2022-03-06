@@ -2,15 +2,14 @@ package com.isfp
 import groovy.json.JsonSlurper
 
 class ProjectModel implements Serializable {
-    String projectName;
-    String buildNode;
-    String buildDirectory;
-    String appDirectory;
-    ProjectModel(name){
+    def _context
+    ProjectModel(context){
+        this._context=context
+
+    }
+    def readConfig(name){
         def jsonSlurper = new JsonSlurper()
-        def config = jsonSlurper.parse(new File('resources/config.json'))
-        this.projectName=name
-        this.buildNode=config[name].buildNode
-        this.buildDirectory=config[name].buildDirectory
+        def config = jsonSlurper.parse(this.libraryResource("config.json"))
+        return config[name]
     }
  }

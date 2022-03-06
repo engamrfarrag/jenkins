@@ -1,4 +1,5 @@
 import com.isfp.ProjectModel
 def call(String projectname){
-    return new ProjectModel(projectname)
+    def project = new ProjectModel(this)
+    return project.readConfig(projectname)
 }
