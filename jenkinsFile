@@ -1,14 +1,17 @@
 @Library('isfpLib') _
-def config =[:]
+
 
 pipeline {
+    tools{
+    maven 'maven 3.3.3'
+    }
     agent any
 
     stages {
         stage('prepare build and deployment stage') {
             steps {
                 script{
-                    config=projectConfig(project)
+                    projectConfig(project)
                     
                 }
             }
@@ -17,11 +20,9 @@ pipeline {
             steps{
                 node(config.buildNode){
                     script{
-                    svn=projectSVN(config)
-                    if(svn.status){
-                        buildProject(config)
+                    if(projectSVN()){
+                        buildProject()
                         }
-                    createPatch(svn.search(patchVersion))
                     }
                 }
             }
