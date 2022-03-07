@@ -1,5 +1,6 @@
 @Library('isfpLib') _
 
+def config=[:]
 
 pipeline {
     tools{
@@ -11,7 +12,7 @@ pipeline {
         stage('prepare build and deployment stage') {
             steps {
                 script{
-                    projectConfig(project)
+                   config=projectConfig(project)
                     
                 }
             }
