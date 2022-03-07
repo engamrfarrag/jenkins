@@ -4,7 +4,7 @@ def svnUpdate(){
     def dir = configurationContext.project.srcDirectory
     echo dir
     def svnfiles=sh (returnStdout : true , script :'cd $dir  && svn up').split('\n')
-    if(svnfiles.size > 2){
+    if(svnfiles.length  > 2){
         return true
     }
 }
