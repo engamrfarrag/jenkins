@@ -5,5 +5,6 @@ class configurationContext {
    static setProject(config,projectName){
         def projectJSON= config[projectName]
         project.buildNode=projectJSON.buildNode
+        project.srcDirectory=projectJSON.srcDirectory
    }
  }

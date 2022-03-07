@@ -5,4 +5,5 @@ class ProjectModel implements Serializable {
     String buildNode
     String buildDirectory
     String appDirectory
+    String srcDirectory
  }
