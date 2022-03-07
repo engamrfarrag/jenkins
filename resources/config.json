@@ -2,6 +2,7 @@
     "erp":
         {
             "buildNode":"JenkinsHost",
+            "srcDirectory":"/cm_tool/ERP/domain2/",
             "buildDirectory":"",
             "appDirectory":"",
             "replacementFiles":[

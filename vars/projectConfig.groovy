@@ -1,8 +1,6 @@
-import com.isfp.ProjectModel
-import groovy.json.JsonSlurper
+import com.isfp.*
+
 def call(String projectname){
-        def jsonSlurper = new JsonSlurper()
-        def config = jsonSlurper.parseText(this.libraryResource("config.json"))
-        def project= config[projectname]
-        return new ProjectModel(project)
+        configurationContext.setProject(projectname)
+        return configurationContext.project
 }
