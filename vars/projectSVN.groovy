@@ -1,3 +1,4 @@
+import com.isfp.configurationContext
 
 def svnUpdate(){
     def dir = configurationContext.project.srcDirectory
