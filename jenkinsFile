@@ -21,7 +21,7 @@ pipeline {
             steps{
                 node(config.buildNode){
                     script{
-                    if(projectSVN()){
+                    if(projectSVN().svnUpdate()){
                         buildProject()
                         }
                     }
