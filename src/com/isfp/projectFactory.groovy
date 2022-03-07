@@ -1,6 +1,6 @@
 package com.isfp
 import groovy.json.JsonSlurper
-class projectFactory implements Serializable {
+class projectFactory {
     
    static createProject(projectName){
     def jsonSlurper = new JsonSlurper()
