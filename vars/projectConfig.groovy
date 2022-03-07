@@ -1,4 +1,4 @@
-import com.isfp.*
+import com.isfp.configurationContext
 
 def call(String projectname){
         configurationContext.setProject(projectname)
