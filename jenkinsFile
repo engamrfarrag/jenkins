@@ -2,36 +2,151 @@
 
 def config=[:]
 
-pipeline {
-    tools{
-    maven 'maven 3.3.3'
-    }
-    agent any
+def svnDir='/cm_tool/ERP/domain4'
+def gitDir='/home/cmo/git/ERP2'
+def patchDir='/opt/Patches-ERP2'
+def backDir ='/opt/Patches_backup_ERP2'
+def svnUpdateCommand='svn up'
+def gitUpdateCommand='git svn rebase'
+def gitSearchCommand='git log --no-commit-id --oneline --name-only'
 
+def sourcePrepare() {
+    sh 'cd $svnDir && $svnUpdateCommand'
+    if(gitDir){
+    sh 'cd $gitDir && $gitUpdateCommand'
+    }
+    saveList(searchSCM(patchVersion))
+}
+def searchSCM(key){
+    def searchOutput=''
+     if(gitDir){
+        searchOutput=sh(returnStdout:true,script:'cd $gitDir && $gitSearchCommand --grep="$key"').trim()
+    }else{
+        searchOutput=sh(returnStdout:true,script:'cd $svnDir && $svnSearchCommand --search="$key"').trim()
+    }
+     return searchOutput
+}
+def saveList(textFile){
+    sh'echo "$textFile" > svnlog.txt'
+    sh 'python /cm_tool/svnfiles.py svnlog.txt ERP2 blacklist.txt'
+    sh 'mv outsvn.txt "$patchDir/list/$patchName.txt"'
+}
+def unInstall(){
+    sh '''
+        if [ -d "/opt/Patches_backup_ERP2/$applicationName" ] 
+        then
+        cd "$patchDir/$applicationName"
+        "./Uninstall $patchName.sh"
+        '''
+}
+def createPatch(){
+                sh '''
+                        mvn clean install --file /cm_tool/ERP/domain2/pom.xml
+                        cd /opt2 && java -cp /opt2 Patch "$patchName" domain2 /opt2/erp/payara41 /opt2 
+                        cd /opt2/Patches && ./"$patchName.sh"
+                        mv $patchName $applicationName
+                    '''
+                       dir('/opt/Patches-ERP2/'+patchVersion+'ERP2-domain4'){
+                           unstash 'pss'
+                           unstash 'sql'
+                           sh 'mv pss "$patchVersion.ERP2.pss"'
+                           sh 'mv sql "$patchVersion.ERP2.sql"'
+}
+
+pipeline {
+    agent none
     stages {
-        stage('prepare build and deployment stage') {
+        stage('Build And create Patch') {
             steps {
-                script{
-                   config=projectConfig(project)
-                    
-                }
+               script{
+                   node('Server52'){
+                       if(build){
+                       sh '''
+                       cd /cm_tool/ERP/domain4 && svn up
+                       cd /home/cmo/git/ERP && git svn rebase
+                       git log --grep="[pP]${patchVersion:1}" --no-commit-id --oneline --name-only > svnlog.txt
+                       python /cm_tool/svnfiles.py svnlog.txt ERP2 blacklist.txt
+                       mv  outsvn.txt "/opt/Patches-ERP2/lists/$patchName.txt"
+                       '''
+                       sh '''
+                        if [ -d "/opt/Patches_backup_ERP2/$applicationName" ] 
+                        then
+                        cd "/opt/Patches-ERP2/$applicationName"
+                        "./Uninstall $patchName.sh"
+                       '''
+                       sh '''
+                        cd /cm_tool/maven2/bin && ./mvn clean install --file /cm_tool/ERP/domain2/pom.xml
+                        cd /opt2 && /opt2/java/jdk1.8.0_66/bin/java -cp /opt2 Patch "$patchName" domain2 /opt2/erp/payara41 /opt2 
+                        cd /opt2/Patches && ./"$patchName.sh"
+                        mv $patchName $applicationName
+                        '''
+                       dir('/opt/Patches-ERP2/'+patchVersion+'ERP2-domain4'){
+                           unstash 'pss'
+                           unstash 'sql'
+                           sh 'mv pss "$patchVersion.ERP2.pss"'
+                           sh 'mv sql "$patchVersion.ERP2.sql"'
+                       }
+                       sh 'kill -9 $(ps -ef | pgrep -f domain4 | awk \'{print $1}\')'
+                       dir('/opt/erp/payara41/glassfish/bin'){
+                           sh 'JENKINS_NODE_COOKIE=dontKillMe nohup ./asadmin start-domain domain4'
+                       }
+                       }
+                       dir('/opt/Patches-ERP2'){
+                           stash includes: patchVersion+'.ERP2-domain4/*', name: 'patch'
+                       }
+                       
+                   }
+               }
             }
         }
-        stage('Build Project'){
-            steps{
-                node(config.buildNode){
-                    script{
-                    if(projectSVN().svnUpdate()){
-                        buildProject()
-                        }
-                    }
-                }
-            }
-        }
-        stage('Deploy Patch on Project '){
-            steps{
-                echo 'deploy'
+        stage('Deploy') {
+            steps {
+               script{
+                   if( deploy == 'domain4'){
+                       node('Server52'){
+                           dir('/patches/jenkins'){
+                               unstash 'patch'
+                           }
+                        sh '''
+                            echo 'if [ -d "/opt/Patches_backup_ERP2/$patchVersion.ERP2-domain4" ]
+                            then
+                            cd "/opt/Patches-ERP2/$patchVersion.ERP2-domain4"
+                            "./Uninstall $patchVersion.ERP2.sh"
+                            fi
+                            mv "/patches/jenkins/$patchVersion.ERP2-domain4" "/opt/Patches-ERP2"
+                            cd "/opt/Patches-ERP2/$patchVersion.ERP2-domain4"
+                            "./Install $patchVersion.ERP2.sh"
+                            killall -9 java 
+                            cd /opt/erp/payara41/glassfish/bin
+                            ./asadmin start-domain domain1
+                            ' | at 17:00
+                            '''
+                       }
+                   }else if(deploy == 'simulation'){
+                       node('simu194'){
+                           dir('/opt/Patches-ERP2'){
+                               sh
+                               '''
+                                if [ -d "/opt/Patches-ERP2/$patchVersion.ERP2-domain4" ]
+                                then
+	                            cd "/opt/Patches-ERP2/$patchVersion.ERP2-domain4"
+	                            "./Uninstall $patchVersion.ERP2.sh"
+                                fi
+                               '''
+                               unstash 'patch'
+                           }
+                        sh '''
+                           cd "/opt/Patches-ERP2/$patchVersion.ERP2-domain4"
+                           "./Install $patchVersion.ERP2.sh"
+                           '''
+                        sh 'kill -9 $(ps -ef | pgrep domain1 | awk \'{print $1}\')' 
+                        dir(' /opt/erp/payara41/glassfish/bin'){
+                           sh 'JENKINS_NODE_COOKIE=dontKillMe && nohup ./asadmin start-domain domain1'
+                            }
+                       }
+                   }
+               }
             }
         }
     }
-}
+
