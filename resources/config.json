@@ -3,16 +3,17 @@
         {
             "buildNode":"JenkinsHost",
             "srcDirectory":"/cm_tool/ERP/domain2/",
-            "buildDirectory":"",
-            "appDirectory":"",
+            "patchPath":"/opt/Patches",
+            "backupPath":"/opt/Patches_backup",
+            "appDirectory":"/opt/erp/payara41/glassfish/domains/domain2",
             "replacementFiles":[
                 {
-                    "src":"",
-                    "destenation":""
+                    "src":"/src/main/java/com/",
+                    "destenation":"/target/classes/com/"
                 },
                 {
-                    "src":"",
-                    "destenation":""
+                    "src":"/src/main/java/org/",
+                    "destenation":"/target/classes/org/"
                 }
             ]
         },

@@ -8,6 +8,6 @@ class ProjectModel implements Serializable {
     String backupPath
     String patchPath
     String[] blockList
-    def Replacement
+    def replacement
     
  }

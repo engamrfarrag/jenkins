@@ -6,5 +6,8 @@ class configurationContext {
         def projectJSON= config[projectName]
         project.buildNode=projectJSON.buildNode
         project.srcDirectory=projectJSON.srcDirectory
+        project.patchPath=projectJSON.backupPath
+        project.appDirectory=projectJSON.patchPath
+        project.replacement=projectJSON.replacementFiles
    }
  }
