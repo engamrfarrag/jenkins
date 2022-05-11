@@ -3,7 +3,11 @@ class ProjectModel implements Serializable {
     ProjectModel(){
     }
     String buildNode
-    String buildDirectory
     String appDirectory
     String srcDirectory
+    String backupPath
+    String patchPath
+    String[] blockList
+    def Replacement
+    
  }
