@@ -1,7 +1,7 @@
 package com.isfp
 class ProjectModel implements Serializable {
     ProjectModel(){
-        replacement=new List<Replacement>()
+        replacement=new ArrayList<Replacement>()
     }
     String buildNode
     String appDirectory
