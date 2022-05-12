@@ -9,11 +9,11 @@
             "replacementFiles":[
                 {
                     "src":"/src/main/java/com/",
-                    "destination":"/target/classes/com/"
+                    "dst":"/target/classes/com/"
                 },
                 {
                     "src":"/src/main/java/org/",
-                    "destination":"/target/classes/org/"
+                    "dst":"/target/classes/org/"
                 }
             ]
         },

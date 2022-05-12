@@ -1,7 +1,9 @@
 package com.isfp
 class Replacement implements Serializable {
-    Replacement(){
+    Replacement(source,destination){
+        src=source
+        dst=destination
     }
     String src
-    String destination
+    String dst
  }
