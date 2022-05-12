@@ -8,6 +8,7 @@ class configurationContext {
         project.srcDirectory=projectJSON.srcDirectory
         project.patchPath=projectJSON.backupPath
         project.appDirectory=projectJSON.patchPath
-        project.replacement=projectJSON.replacementFiles
+        def replacments =projectJSON.replacementFiles
+        replacement.each(project.replacement.add(new Replacement(){src=it['src'],destination=it['destination']}))
    }
  }
